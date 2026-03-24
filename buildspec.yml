@@ -20,6 +20,8 @@ phases:
       - echo "App Name - $APP_NAME"
       - echo "Port - $PORT"
       - echo "================================================"
+      - npm test -- --coverage --coverageReporters=text
+      # Build fails here if coverage < 70%
 
   build:
     commands:
@@ -32,7 +34,7 @@ phases:
       - cat .env
       - echo "Running unit tests with coverage..."
       - npm test -- --coverage
-      
+
 
   post_build:
     commands:
