@@ -1,6 +1,6 @@
 module.exports = {
   collectCoverage: true,
-  coverageDirectory: "coverage",
+  coverageProvider: "v8", // or "babel"
   coverageThreshold: {
     global: {
       branches: 70,
