@@ -32,8 +32,7 @@ phases:
       - cat .env
       - echo "Running unit tests with coverage..."
       - npm test -- --coverage
-      - this-command-does-not-exist
-      - npm run build
+      
 
   post_build:
     commands:
