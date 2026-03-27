@@ -1,8 +1,9 @@
 version: 0.2
 
 env:
-  variables:
-    ENVIRONMENT: "development"       # set your environment
+  parameter-store:
+    API_URL: "/myapp/development/api-url"   # ✅ Fetches API_URL from SSM automatically
+
 phases:
   install:
     runtime-versions:
@@ -14,30 +15,31 @@ phases:
   pre_build:
     commands:
       - echo "Fetching parameters for $ENVIRONMENT environment from SSM..."
-      - export NODE_ENV=$(aws ssm get-parameter --name /sour-mango/$ENVIRONMENT/node-env --with-decryption --query 'Parameter.Value' --output text)
-      - export APP_NAME=$(aws ssm get-parameter --name /sour-mango/$ENVIRONMENT/app-name --with-decryption --query 'Parameter.Value' --output text)
-      - export PORT=$(aws ssm get-parameter --name /sour-mango/$ENVIRONMENT/port --with-decryption --query 'Parameter.Value' --output text)
-      - export API_URL=$(aws ssm get-parameter --name /sour-mango/$ENVIRONMENT/api-url --with-decryption --query 'Parameter.Value' --output text)
+      - export NODE_ENV=$(aws ssm get-parameter --name /sour-mango/$ENVIRONMENT/node-env --query 'Parameter.Value' --output text)
+      - export APP_NAME=$(aws ssm get-parameter --name /sour-mango/$ENVIRONMENT/app-name --query 'Parameter.Value' --output text)
+      - export PORT=$(aws ssm get-parameter --name /sour-mango/$ENVIRONMENT/port --query 'Parameter.Value' --output text)
       - echo "================================================"
       - echo "Building for Environment - $ENVIRONMENT"
       - echo "Node Environment - $NODE_ENV"
       - echo "App Name - $APP_NAME"
       - echo "Port - $PORT"
-      - echo "API_URL - $API_URL"
+      - echo "API_URL - $API_URL"     # ✅ This comes from parameter-store
       - echo "================================================"
+      - npm test -- --coverage --coverageReporters=text
+      # Build fails here if coverage < 70%
 
   build:
     commands:
-      - echo "Creating .env file..."
+      - echo "Creating .env file with environment-specific variables..."
       - echo "NODE_ENV=$NODE_ENV" > .env
       - echo "APP_NAME=$APP_NAME" >> .env
       - echo "PORT=$PORT" >> .env
-      - echo "API_URL=$API_URL" >> .env
-      - echo ".env file created!"
+      - echo "API_URL=$API_URL" >> .env     # ✅ Add API_URL to .env
+      - echo ".env file created successfully!"
+      - echo "Contents of .env file:"
       - cat .env
-      - echo "Running unit tests with coverage..."
-      - npm test -- --coverage      # build will fail if coverage <70%
-      - echo "Running production build..."
+      - echo "Building against API: $API_URL"   # ✅ Use API_URL in build
+      - npm run build
 
   post_build:
     commands:
