@@ -1,5 +1,9 @@
 version: 0.2
 
+env:
+parameter-store:
+API_URL: /myapp/development/api-url
+
 phases:
   install:
     runtime-versions:
@@ -34,7 +38,8 @@ phases:
       - cat .env
       - echo "Running unit tests with coverage..."
       - npm test -- --coverage
-
+      - echo "Building against API: $API_URL"
+      - npm run build
 
   post_build:
     commands:
