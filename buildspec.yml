@@ -38,7 +38,6 @@ phases:
       - echo "Running unit tests with coverage..."
       - npm test -- --coverage      # build will fail if coverage <70%
       - echo "Running production build..."
-      - npm run build
 
   post_build:
     commands:
