@@ -38,7 +38,7 @@ phases:
       - cat .env
       - echo "Running unit tests with coverage..."
       - npm test -- --coverage
-      - echo "Building against API: $API_URL"
+      - echo "Building against API:$API_URL"
       - npm run build
 
   post_build:
