@@ -1,9 +1,8 @@
 version: 0.2
 
 env:
-parameter-store:
-API_URL: /myapp/development/api-url
-
+  parameter-store:
+    API_URL: /myapp/development/api-url
 phases:
   install:
     runtime-versions:
