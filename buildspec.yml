@@ -42,6 +42,8 @@ artifacts:
     - smoke-test.js
     - app.test.js
     - index.html
+    - infrastructure.yml
+    
   name: sour-mango-$ENVIRONMENT-artifact
   discard-paths: no
   exclude-paths:
