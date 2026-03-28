@@ -1,46 +1,28 @@
 version: 0.2
 
-# ✅ Fetch API_URL automatically from SSM Parameter Store
-env:
-  parameter-store:
-    API_URL: "/myapp/development/api-url"
-
 phases:
   install:
     runtime-versions:
       nodejs: 18
     commands:
       - echo "Installing dependencies..."
-      - npm install
+      - npm ci  # 'npm ci' is faster and more reliable for CI environments than 'npm install'
 
   pre_build:
     commands:
-      - echo "Fetching parameters for $ENVIRONMENT environment from SSM..."
+      - echo "Fetching parameters for $ENVIRONMENT from SSM..."
       - export NODE_ENV=$(aws ssm get-parameter --name /sour-mango/$ENVIRONMENT/node-env --query 'Parameter.Value' --output text)
       - export APP_NAME=$(aws ssm get-parameter --name /sour-mango/$ENVIRONMENT/app-name --query 'Parameter.Value' --output text)
       - export PORT=$(aws ssm get-parameter --name /sour-mango/$ENVIRONMENT/port --query 'Parameter.Value' --output text)
-      - echo "================================================"
-      - echo "Building for Environment - $ENVIRONMENT"
-      - echo "Node Environment - $NODE_ENV"
-      - echo "App Name - $APP_NAME"
-      - echo "Port - $PORT"
-      - echo "API_URL - $API_URL"
-      - echo "================================================"
+      - echo "Running tests and verifying coverage..."
+      # If this fails, the build stops here before entering the build phase
       - npm test -- --coverage --coverageReporters=text
-# Note: Build will fail here if coverage < 70% (can be enforced in package.json)
 
   build:
     commands:
-      - echo "Creating .env file with environment-specific variables..."
-      - echo "NODE_ENV=$NODE_ENV" > .env
-      - echo "APP_NAME=$APP_NAME" >> .env
-      - echo "PORT=$PORT" >> .env
-      - echo "API_URL=$API_URL" >> .env
-      - echo ".env file created successfully!"
-      - echo "Contents of .env file:"
-      - cat .env
-      - echo "Building against API: $API_URL"
-      - npm run build || echo "No build script defined, skipping"
+      - echo "Creating .env file for $APP_NAME..."
+      - printf "NODE_ENV=%s\nAPP_NAME=%s\nPORT=%s\n" "$NODE_ENV" "$APP_NAME" "$PORT" > .env
+      - echo "Build phase complete."
 
   post_build:
     commands:
@@ -61,6 +43,7 @@ artifacts:
     - app.test.js
     - index.html
   name: sour-mango-$ENVIRONMENT-artifact
+  discard-paths: no
   exclude-paths:
     - node_modules/**/*
     - coverage/**/*
@@ -68,7 +51,6 @@ artifacts:
     - .git/**/*
     - .gitignore
     - buildspec.yml
-    - sour-mango-v1.zip
 
 cache:
   paths:
