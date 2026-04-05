@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Description: Simple S3 static website with two buckets
+Description: Simple S3 static website
 
 Parameters:
   Environment:
@@ -14,14 +14,6 @@ Resources:
       WebsiteConfiguration:
         IndexDocument: index.html
 
-  LogsBucket:                   # <-- Second S3 bucket
-    Type: AWS::S3::Bucket
-    Properties:
-      BucketName: !Sub 'myapp-logs-${Environment}-${AWS::AccountId}'
-
 Outputs:
-  WebsiteBucketName:
+  BucketName:
     Value: !Ref WebsiteBucket
-
-  LogsBucketName:
-    Value: !Ref LogsBucket      # <-- Output the second bucket name
