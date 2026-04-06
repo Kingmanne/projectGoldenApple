@@ -1,45 +1,34 @@
 version: 0.2
 
-env:
-  parameter-store:
-    API_URL: /myapp/development/api-url
-
 phases:
   install:
     runtime-versions:
       nodejs: 18
     commands:
       - echo "Installing dependencies..."
-      - npm ci
-      
+      - npm ci  # 'npm ci' is faster and more reliable for CI environments than 'npm install'
+
   pre_build:
     commands:
-      - echo "Running unit tests with coverage..."
-      - npm run test:coverage
-    finally:
-      - echo "Pre-build phase completed"
+      - echo "Fetching parameters for $ENVIRONMENT from SSM..."
+      - export NODE_ENV=$(aws ssm get-parameter --name /sour-mango/$ENVIRONMENT/node-env --query 'Parameter.Value' --output text)
+      - export APP_NAME=$(aws ssm get-parameter --name /sour-mango/$ENVIRONMENT/app-name --query 'Parameter.Value' --output text)
+      - export PORT=$(aws ssm get-parameter --name /sour-mango/$ENVIRONMENT/port --query 'Parameter.Value' --output text)
+      - echo "Running tests and verifying coverage..."
+      # If this fails, the build stops here before entering the build phase
+      - npm test -- --coverage --coverageReporters=text
 
   build:
     commands:
-      - echo "Creating .env file..."
-      - |
-        printf "NODE_ENV=%s\nAPP_NAME=%s\nPORT=%s\nAPI_URL=%s\n" \
-        "$NODE_ENV" "$APP_NAME" "$PORT" "$API_URL" > .env
+      - echo "Creating .env file for $APP_NAME..."
+      - printf "NODE_ENV=%s\nAPP_NAME=%s\nPORT=%s\n" "$NODE_ENV" "$APP_NAME" "$PORT" > .env
       - echo "Build phase complete."
-    finally:
-      - echo "Build phase completed"
 
   post_build:
     commands:
       - echo "Running smoke tests..."
       - npm run test:smoke
-    finally:
-      - echo "Post-build phase completed"
-
-cache:
-  paths:
-    - 'node_modules/**/*'
-    - '.npm/**/*'
+      - echo "✅ Build completed successfully for $APP_NAME ($ENVIRONMENT)!"
 
 artifacts:
   files:
@@ -51,6 +40,19 @@ artifacts:
     - 'scripts/**/*'
     - server.js
     - smoke-test.js
+    - app.test.js
+    - index.html
+    - infrastructure.yml
+    
+  name: sour-mango-$ENVIRONMENT-artifact
+  discard-paths: no
+  exclude-paths:
+    - node_modules/**/*
+    - coverage/**/*
+    - __tests__/**/*
+    - .git/**/*
+    - .gitignore
+    - buildspec.yml
 
 cache:
   paths:
