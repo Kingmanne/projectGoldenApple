@@ -2,12 +2,7 @@ version: 0.2
 
 env:
   parameter-store:
-    NODE_ENV: "/sour-mango/$ENVIRONMENT/node-env"
-    APP_NAME: "/sour-mango/$ENVIRONMENT/app-name"
-    PORT: "/sour-mango/$ENVIRONMENT/port"
-    API_URL: "/myapp/$ENVIRONMENT/api-url"
-  variables:
-    CI: "true"
+    API_URL: /myapp/development/api-url
 
 phases:
   install:
@@ -16,9 +11,7 @@ phases:
     commands:
       - echo "Installing dependencies..."
       - npm ci
-    finally:
-      - echo "Install phase completed"
-
+      
   pre_build:
     commands:
       - echo "Running unit tests with coverage..."
@@ -58,8 +51,6 @@ artifacts:
     - 'scripts/**/*'
     - server.js
     - smoke-test.js
-  name: sour-mango-$ENVIRONMENT-artifact
-  discard-paths: no
 
 cache:
   paths:
