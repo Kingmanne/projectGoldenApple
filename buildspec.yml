@@ -19,7 +19,6 @@ phases:
       - export APP_NAME=$(aws ssm get-parameter --name /sour-mango/$ENVIRONMENT/app-name --query 'Parameter.Value' --output text)
       - export PORT=$(aws ssm get-parameter --name /sour-mango/$ENVIRONMENT/port --query 'Parameter.Value' --output text)
       - echo "Running tests and verifying coverage..."
-      # If this fails, the build stops here before entering the build phase
       - npm test -- --coverage --coverageReporters=text
 
   build:
@@ -49,7 +48,6 @@ artifacts:
     - app.test.js
     - index.html
     - infrastructure.yml
-    
   name: sour-mango-$ENVIRONMENT-artifact
   discard-paths: no
   exclude-paths:
