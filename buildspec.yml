@@ -1,5 +1,9 @@
 version: 0.2
 
+env:
+  parameter-store:
+    API_URL: /myapp/development/api-url
+
 phases:
   install:
     runtime-versions:
@@ -20,6 +24,8 @@ phases:
 
   build:
     commands:
+      - echo "Building against API: $API_URL"
+      - npm run build
       - echo "Creating .env file for $APP_NAME..."
       - printf "NODE_ENV=%s\nAPP_NAME=%s\nPORT=%s\n" "$NODE_ENV" "$APP_NAME" "$PORT" > .env
       - echo "Build phase complete."
