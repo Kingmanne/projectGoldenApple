@@ -1,5 +1,14 @@
 version: 0.2
 
+env:
+  parameter-store:
+    NODE_ENV: "/sour-mango/$ENVIRONMENT/node-env"
+    APP_NAME: "/sour-mango/$ENVIRONMENT/app-name"
+    PORT: "/sour-mango/$ENVIRONMENT/port"
+    API_URL: "/myapp/$ENVIRONMENT/api-url"
+  variables:
+    CI: "true"
+
 phases:
   install:
     runtime-versions:
@@ -7,44 +16,37 @@ phases:
     commands:
       - echo "Installing dependencies..."
       - npm ci
+    finally:
+      - echo "Install phase completed"
 
   pre_build:
     commands:
-      - echo "Fetching parameters for $ENVIRONMENT from SSM..."
-
-      # 🔹 Sour-mango app parameters
-      - export NODE_ENV=$(aws ssm get-parameter --name /sour-mango/$ENVIRONMENT/node-env --query 'Parameter.Value' --output text)
-      - export APP_NAME=$(aws ssm get-parameter --name /sour-mango/$ENVIRONMENT/app-name --query 'Parameter.Value' --output text)
-      - export PORT=$(aws ssm get-parameter --name /sour-mango/$ENVIRONMENT/port --query 'Parameter.Value' --output text)
-
-      # 🔹 Assignment parameter (teacher example)
-      - export API_URL=$(aws ssm get-parameter --name /myapp/$ENVIRONMENT/api-url --query 'Parameter.Value' --output text)
-
-      # 🔹 Debug output
-      - echo "NODE_ENV=$NODE_ENV"
-      - echo "APP_NAME=$APP_NAME"
-      - echo "PORT=$PORT"
-      - echo "API_URL=$API_URL"
-
-      - echo "Running tests and verifying coverage..."
-      - npm test -- --coverage --coverageReporters=text
+      - echo "Running unit tests with coverage..."
+      - npm run test:coverage
+    finally:
+      - echo "Pre-build phase completed"
 
   build:
     commands:
-      - echo "Creating .env file for $APP_NAME..."
-      - printf "NODE_ENV=%s\nAPP_NAME=%s\nPORT=%s\nAPI_URL=%s\n" \
+      - echo "Creating .env file..."
+      - |
+        printf "NODE_ENV=%s\nAPP_NAME=%s\nPORT=%s\nAPI_URL=%s\n" \
         "$NODE_ENV" "$APP_NAME" "$PORT" "$API_URL" > .env
-
-      - echo ".env file created:"
-      - cat .env
-
       - echo "Build phase complete."
+    finally:
+      - echo "Build phase completed"
 
   post_build:
     commands:
       - echo "Running smoke tests..."
       - npm run test:smoke
-      - echo "✅ Build completed successfully for $APP_NAME ($ENVIRONMENT)!"
+    finally:
+      - echo "Post-build phase completed"
+
+cache:
+  paths:
+    - 'node_modules/**/*'
+    - '.npm/**/*'
 
 artifacts:
   files:
@@ -56,19 +58,8 @@ artifacts:
     - 'scripts/**/*'
     - server.js
     - smoke-test.js
-    - app.test.js
-    - index.html
-    - infrastructure.yml
-    
   name: sour-mango-$ENVIRONMENT-artifact
   discard-paths: no
-  exclude-paths:
-    - node_modules/**/*
-    - coverage/**/*
-    - __tests__/**/*
-    - .git/**/*
-    - .gitignore
-    - buildspec.yml
 
 cache:
   paths:
