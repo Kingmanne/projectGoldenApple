@@ -1,9 +1,5 @@
 version: 0.2
 
-env:
-  parameter-store:
-    API_URL: /myapp/development/api-url
-
 phases:
   install:
     runtime-versions:
@@ -19,14 +15,13 @@ phases:
       - export APP_NAME=$(aws ssm get-parameter --name /sour-mango/$ENVIRONMENT/app-name --query 'Parameter.Value' --output text)
       - export PORT=$(aws ssm get-parameter --name /sour-mango/$ENVIRONMENT/port --query 'Parameter.Value' --output text)
       - echo "Running tests and verifying coverage..."
+      # If this fails, the build stops here before entering the build phase
       - npm test -- --coverage --coverageReporters=text
 
   build:
     commands:
-      - echo "Building against API: $API_URL"
-      - npm run build
       - echo "Creating .env file for $APP_NAME..."
-      - printf "NODE_ENV=%s\nAPP_NAME=%s\nPORT=%s\nAPI_URL=%s\n" "$NODE_ENV" "$APP_NAME" "$PORT" "$API_URL" > .env
+      - printf "NODE_ENV=%s\nAPP_NAME=%s\nPORT=%s\n" "$NODE_ENV" "$APP_NAME" "$PORT" > .env
       - echo "Build phase complete."
 
   post_build:
@@ -48,6 +43,7 @@ artifacts:
     - app.test.js
     - index.html
     - infrastructure.yml
+    
   name: sour-mango-$ENVIRONMENT-artifact
   discard-paths: no
   exclude-paths:
