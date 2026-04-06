@@ -33,7 +33,7 @@ phases:
       - echo "Running tests..."
       - npm test -- --coverage --coverageReporters=text
 
-  phases:
+  
   build:
     commands:
       - echo "Building against API: $API_URL"
