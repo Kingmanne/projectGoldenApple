@@ -39,7 +39,6 @@ phases:
       - echo "Building against API: $API_URL"
       - npm run build
       - echo "Creating .env file..."
-      - |
         printf "NODE_ENV=%s\nAPP_NAME=%s\nPORT=%s\nAPI_URL=%s\n" \
         "$NODE_ENV" "$APP_NAME" "$PORT" "$API_URL" > .env
       - echo ".env file created:"
