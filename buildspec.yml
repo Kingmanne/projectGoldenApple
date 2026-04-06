@@ -13,12 +13,12 @@ phases:
       - echo "Fetching parameters for $ENVIRONMENT from SSM..."
 
       # 🔹 Sour-mango app parameters
-      - export NODE_ENV=$(aws ssm get-parameter --name "/sour-mango/$ENVIRONMENT/node-env" --query 'Parameter.Value' --output text)
-      - export APP_NAME=$(aws ssm get-parameter --name "/sour-mango/$ENVIRONMENT/app-name" --query 'Parameter.Value' --output text)
-      - export PORT=$(aws ssm get-parameter --name "/sour-mango/$ENVIRONMENT/port" --query 'Parameter.Value' --output text)
+      - export NODE_ENV=$(aws ssm get-parameter --name /sour-mango/$ENVIRONMENT/node-env --query 'Parameter.Value' --output text)
+      - export APP_NAME=$(aws ssm get-parameter --name /sour-mango/$ENVIRONMENT/app-name --query 'Parameter.Value' --output text)
+      - export PORT=$(aws ssm get-parameter --name /sour-mango/$ENVIRONMENT/port --query 'Parameter.Value' --output text)
 
-      # 🔹 Assignment parameter (myapp)
-      - export API_URL=$(aws ssm get-parameter --name "/myapp/$ENVIRONMENT/api-url" --query 'Parameter.Value' --output text)
+      # 🔹 Assignment parameter (teacher example)
+      - export API_URL=$(aws ssm get-parameter --name /myapp/$ENVIRONMENT/api-url --query 'Parameter.Value' --output text)
 
       # 🔹 Debug output
       - echo "NODE_ENV=$NODE_ENV"
@@ -32,7 +32,6 @@ phases:
   build:
     commands:
       - echo "Creating .env file for $APP_NAME..."
-
       - printf "NODE_ENV=%s\nAPP_NAME=%s\nPORT=%s\nAPI_URL=%s\n" \
         "$NODE_ENV" "$APP_NAME" "$PORT" "$API_URL" > .env
 
