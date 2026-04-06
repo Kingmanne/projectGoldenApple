@@ -7,7 +7,6 @@
     "test": "jest",
     "test:smoke": "node smoke-test.js",
     "test:coverage": "jest --coverage --coverageThreshold='{\"global\":{\"lines\":60,\"statements\":60,\"functions\":20,\"branches\":20}}'",
-    "build": "echo \"No production build step defined.\"",
     "start": "node server.js"
   },
   "keywords": [],
