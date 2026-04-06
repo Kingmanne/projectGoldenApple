@@ -2,7 +2,7 @@ version: 0.2
 
 env:
   parameter-store:
-   API_URL: /myapp/development/api-url
+    API_URL: /myapp/development/api-url  # ✅ teacher assignment parameter
 
 phases:
   install:
@@ -10,22 +10,34 @@ phases:
       nodejs: 18
     commands:
       - echo "Installing dependencies..."
-      - npm ci  # 'npm ci' is faster and more reliable for CI environments than 'npm install'
+      - npm ci
 
   pre_build:
     commands:
-      - echo "Fetching parameters for $ENVIRONMENT from SSM..."
+      - echo "Fetching sour-mango parameters from SSM..."
+
+      # 🔹 Sour-mango app parameters
       - export NODE_ENV=$(aws ssm get-parameter --name /sour-mango/$ENVIRONMENT/node-env --query 'Parameter.Value' --output text)
       - export APP_NAME=$(aws ssm get-parameter --name /sour-mango/$ENVIRONMENT/app-name --query 'Parameter.Value' --output text)
       - export PORT=$(aws ssm get-parameter --name /sour-mango/$ENVIRONMENT/port --query 'Parameter.Value' --output text)
-      - echo "Running tests and verifying coverage..."
-      # If this fails, the build stops here before entering the build phase
+
+      - echo "NODE_ENV=$NODE_ENV"
+      - echo "APP_NAME=$APP_NAME"
+      - echo "PORT=$PORT"
+      - echo "API_URL=$API_URL"   # ✅ comes from parameter-store automatically
+
+      - echo "Running tests..."
       - npm test -- --coverage --coverageReporters=text
 
   build:
     commands:
       - echo "Creating .env file for $APP_NAME..."
-      - printf "NODE_ENV=%s\nAPP_NAME=%s\nPORT=%s\nAPI_URL=%s\n" "$NODE_ENV" "$APP_NAME" "$PORT" "$API_URL" > .env
+      - printf "NODE_ENV=%s\nAPP_NAME=%s\nPORT=%s\nAPI_URL=%s\n" \
+        "$NODE_ENV" "$APP_NAME" "$PORT" "$API_URL" > .env
+
+      - echo ".env file created:"
+      - cat .env
+
       - echo "Build phase complete."
 
   post_build:
@@ -47,7 +59,7 @@ artifacts:
     - app.test.js
     - index.html
     - infrastructure.yml
-    
+
   name: sour-mango-$ENVIRONMENT-artifact
   discard-paths: no
   exclude-paths:
