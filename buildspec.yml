@@ -32,11 +32,18 @@ phases:
       # Run tests
       - echo "Running tests..."
       - npm test -- --coverage --coverageReporters=text
+      - echo '=== Running security audit ==='
+      - npm audit --audit-level=high
+      # Build fails here if high or critical vulnerabilities are found
+      - echo '=== Security audit passed ==='
+      - npm run lint
+      - npm audit --json > security-report.json || true
+      - npm audit --audit-level=high # this one actually fails the build
 
   
   build:
     commands:
-      - echo "Building against API:[$API_URL]"
+      - echo "Building against API:[API_URL]"
       - echo "Creating .env file..."
         printf "NODE_ENV=%s\nAPP_NAME=%s\nPORT=%s\nAPI_URL=%s\n" \
         "$NODE_ENV" "$APP_NAME" "$PORT" "$API_URL" > .env
@@ -62,6 +69,9 @@ artifacts:
     - app.test.js
     - index.html
     - infrastructure.yml
+    - '**/*'
+    - security-report.json
+      base-directory:build
 
   name: sour-mango-$ENVIRONMENT-artifact
   discard-paths: no
