@@ -28,6 +28,7 @@ phases:
       - echo "APP_NAME=$APP_NAME"
       - echo "PORT=$PORT"
       - echo "API_URL=$API_URL"  # Comes automatically from parameter-store
+      - npm ci
 
       # Run tests
       - echo "Running tests..."
@@ -85,4 +86,9 @@ artifacts:
 cache:
   paths:
     - 'node_modules/**/*'
-    
+
+reports:
+ MyAppTestReport:
+  files:
+    - 'test-results/junit.xml'
+  file-format: JUNITXML
