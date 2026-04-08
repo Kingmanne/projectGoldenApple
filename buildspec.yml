@@ -34,6 +34,7 @@ phases:
       - npm test -- --coverage --coverageReporters=text
       - echo '=== Running security audit ==='
       - npm audit --audit-level=high
+      - npm audit fix
       # Build fails here if high or critical vulnerabilities are found
       - echo '=== Security audit passed ==='
       - npm run lint
