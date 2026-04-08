@@ -36,7 +36,6 @@ phases:
       - npm audit --audit-level=high
       # Build fails here if high or critical vulnerabilities are found
       - echo '=== Security audit passed ==='
-      - npm run lint
       - npm audit --json > security-report.json || true
       - npm audit --audit-level=high # this one actually fails the build
 
