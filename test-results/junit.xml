@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="jest tests" tests="6" failures="0" errors="0" time="0.266">
+  <testsuite name="Express Application Tests" errors="0" failures="0" skipped="0" timestamp="2026-04-08T21:22:06" time="0.23" tests="6">
+    <testcase classname="Express Application Tests should respond with 200 on GET /" name="Express Application Tests should respond with 200 on GET /" time="0.023">
+    </testcase>
+    <testcase classname="Express Application Tests should serve HTML content" name="Express Application Tests should serve HTML content" time="0.005">
+    </testcase>
+    <testcase classname="Express Application Tests should return 404 for unknown routes" name="Express Application Tests should return 404 for unknown routes" time="0.003">
+    </testcase>
+    <testcase classname="Express Application Tests should serve static files" name="Express Application Tests should serve static files" time="0.002">
+    </testcase>
+    <testcase classname="Express Application Tests should create valid express app" name="Express Application Tests should create valid express app" time="0">
+    </testcase>
+    <testcase classname="Express Application Tests should export createApp function" name="Express Application Tests should export createApp function" time="0.001">
+    </testcase>
+  </testsuite>
+</testsuites>
