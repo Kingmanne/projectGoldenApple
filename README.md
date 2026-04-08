@@ -1,2 +1,3 @@
-# projectGoldenApple
-# projectGoldenApple
+# My DevOps Application
+![Build Status](https://codebuild.eu-north-1.amazonaws.com/badges?uuid=eyJlbmNyeXB0ZWREYXRhIjoiSnNTcEdEYWlXTjJkUVdENVAwTEUvVlIvSVM5aGRWWW93dDBTSDNxNGJXVU1jUVk4THh2S1RBYWE1L2d5aU4wWHRWWUxZTDFyUmhtN01BbnExM25DOUZnPSIsIml2UGFyYW1ldGVyU3BlYyI6InI3MmtKL2xzeEhzc2QwbFkiLCJtYXRlcmlhbFNldFNlcmlhbCI6MX0%3D&branch=main)
+This application is deployed via AWS CodePipeline.
