@@ -49,6 +49,7 @@ phases:
         "$NODE_ENV" "$APP_NAME" "$PORT" "$API_URL" > .env
       - echo ".env file created:"
       - cat .env
+      - echo $(echo API_URL)
 
   post_build:
     commands:
