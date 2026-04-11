@@ -2,7 +2,7 @@ version: 0.2
 
 env:
   parameter-store:
-    API_URL: /myapp/development/api-url  # Teacher assignment parameter
+    API_URL: /yourapp/development/api-url  # Teacher assignment parameter
 
 phases:
   install:
