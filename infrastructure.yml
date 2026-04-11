@@ -1,19 +1,38 @@
 AWSTemplateFormatVersion: "2010-09-09"
 Description: GoldenKiwi Infrastructure - EC2 + S3
 
+# -------------------------
+# Parameters
+# -------------------------
 Parameters:
   EnvironmentName:
     Type: String
     Default: dev
 
+# -------------------------
+# Mappings
+# -------------------------
+Mappings:
+  RegionMap:
+    us-east-1:
+      AMI: ami-0c02fb55956c7d316
+    eu-north-1:
+      AMI: ami-075449515af5df0d1
+    eu-west-1:
+      AMI: ami-0fed63ea358539e44
+
+# -------------------------
+# Resources
+# -------------------------
 Resources:
-  # VIOLATION 1: S3 bucket with no encryption
+
+  # S3 Bucket
   GoldenKiwiBucket:
     Type: AWS::S3::Bucket
     Properties:
-      BucketName: !Sub "${EnvironmentName}-goldenkiwi-bucket"
+      BucketName: !Sub "${EnvironmentName}-goldennkiwi-bucket"
 
-  # VIOLATION 2: Security group allowing port 22 from anywhere
+  # Security Group
   GoldenKiwiSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
@@ -24,30 +43,29 @@ Resources:
           ToPort: 22
           CidrIp: 0.0.0.0/0
 
+  # EC2 Instance
   GoldenKiwiEC2:
     Type: AWS::EC2::Instance
     Properties:
       InstanceType: t3.micro
-      ImageId: !FindInMap [RegionMap, !Ref AWS::Region, AMI]
+      ImageId: !FindInMap 
+        - RegionMap
+        - !Ref AWS::Region
+        - AMI
       SecurityGroupIds:
         - !Ref GoldenKiwiSecurityGroup
       Tags:
         - Key: Name
           Value: !Sub "${EnvironmentName}-GoldenKiwi-Server"
 
-Mappings:
-  RegionMap:
-    us-east-1:
-      AMI: ami-0c02fb55956c7d316
-    eu-north-1:
-      AMI: ami-075449515af5df0d1
-    eu-west-1:
-      AMI: ami-0fed63ea358539e44
-
+# -------------------------
+# Outputs
+# -------------------------
 Outputs:
   InstanceId:
     Description: EC2 Instance ID
     Value: !Ref GoldenKiwiEC2
+
   BucketName:
     Description: S3 Bucket Name
     Value: !Ref GoldenKiwiBucket
