@@ -1,8 +1,6 @@
 version: 0.2
 
-env:
-  parameter-store:
-    API_URL: /myapp/development/api-url  # Teacher assignment parameter
+
 
 phases:
   install:
@@ -43,14 +41,12 @@ phases:
   
   build:
     commands:
-      - echo "Building against API:[API_URL]"
       - echo "Creating .env file..."
         printf "NODE_ENV=%s\nAPP_NAME=%s\nPORT=%s\nAPI_URL=%s\n" \
         "$NODE_ENV" "$APP_NAME" "$PORT" "$API_URL" > .env
       - echo ".env file created:"
       - cat .env
-      - echo "$(echo -n This is the value of our API $API_URL)"
-
+  
   post_build:
     commands:
       - echo "Running smoke tests..."
