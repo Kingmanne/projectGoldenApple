@@ -1,5 +1,11 @@
 version: 0.2
 
+env:
+  variables:
+    AWS_REGION: us-east-1
+    REPOSITORY_URI: 371510064293.dkr.ecr.us-east-1.amazonaws.com/codebuild-nodejs
+    IMAGE_TAG: latest
+
 phases:
   install:
     runtime-versions:
@@ -10,30 +16,51 @@ phases:
 
   pre_build:
     commands:
+      - echo Logging in to Amazon ECR...
+      - aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $REPOSITORY_URI
+
       - echo Running tests...
       - npm test || true
 
   build:
     commands:
-      - echo Building application...
+      - echo Building Docker image...
+      - docker build -t $REPOSITORY_URI:$IMAGE_TAG .
 
-      # --- ECS (Docker image output handled by pipeline if using Docker build stage) ---
-      - echo "Preparing ECS artifact..."
+      - echo Tagging image...
+      - docker tag $REPOSITORY_URI:$IMAGE_TAG $REPOSITORY_URI:$IMAGE_TAG
+
+      - echo Creating ECS imagedefinitions.json...
       - printf '[{"name":"container","imageUri":"%s"}]' $REPOSITORY_URI:$IMAGE_TAG > imagedefinitions.json
 
-      # --- Lambda package ---
-      - echo "Creating Lambda package..."
-      - zip -r lambda.zip .
+      - echo Creating Lambda deployment package...
+      - zip -r lambda.zip . -x "node_modules/*" ".git/*"
 
   post_build:
     commands:
-      - echo "Build complete"
+      - echo Pushing Docker image to ECR...
+      - docker push $REPOSITORY_URI:$IMAGE_TAG
+
+      - echo Build completed successfully
 
 artifacts:
   files:
-    - imagedefinitions.json   # ECS
-    - lambda.zip              # Lambda
-    - appspec.yml             # EC2
-    - scripts/**              # EC2
+    - imagedefinitions.json
+    - lambda.zip
+    - appspec.yml
+    - scripts/**/*
+    - package.json
+    - package-lock.json
+    - server.js
     - '**/*'
-    
+  discard-paths: no
+
+cache:
+  paths:
+    - '/root/.npm/**/*'
+
+reports:
+  MyAppTestReport:
+    files:
+      - 'test-results/junit.xml'
+    file-format: JUNITXML
