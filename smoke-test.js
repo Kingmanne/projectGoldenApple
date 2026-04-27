@@ -13,11 +13,40 @@ const app = require('./server');
 const server = app.listen(PORT, HOST, () => {
   console.log(`✅ Server started on port ${PORT}`);
   
-  // Give server a moment to fully start
-  setTimeout(() => {
-    runTests();
-  }, 1000);
+  // Wait for server to be truly ready
+  waitForServer(runTests);
 });
+
+function waitForServer(callback, maxRetries = 10, retryDelay = 500) {
+  let attempts = 0;
+  
+  function attempt() {
+    attempts++;
+    
+    const request = http.get(`http://${HOST}:${PORT}/`, (res) => {
+      // Server is ready, drain the response
+      res.on('data', () => {});
+      res.on('end', callback);
+    }).on('error', () => {
+      if (attempts < maxRetries) {
+        console.log(`⏳ Waiting for server... attempt ${attempts}/${maxRetries}`);
+        setTimeout(attempt, retryDelay);
+      } else {
+        console.log('❌ Server failed to start after retries');
+        cleanup(1);
+      }
+    });
+    
+    request.setTimeout(1000, () => {
+      request.destroy();
+      if (attempts < maxRetries) {
+        setTimeout(attempt, retryDelay);
+      }
+    });
+  }
+  
+  attempt();
+}
 
 function runTests() {
   // Test 1: Check if server responds
