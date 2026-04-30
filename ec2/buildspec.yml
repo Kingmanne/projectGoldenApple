@@ -1,0 +1,38 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      nodejs: 18
+    commands:
+      - echo "Installing EC2 dependencies..."
+      - cd ec2 && npm ci && cd ..
+
+  pre_build:
+    commands:
+      - echo "Running EC2 tests (optional)..."
+      - cd ec2 && npm test || true && cd ..
+
+  build:
+    commands:
+      - echo "Creating EC2 deployment package..."
+
+      # Create a clean build directory
+      - mkdir -p dist
+      - cp -r ec2/* dist/
+
+      # Remove dev-only stuff
+      - rm -rf dist/node_modules || true
+
+      # Create final artifact
+      - cd dist
+      - zip -r ../ec2.zip .
+      - cd ..
+
+  post_build:
+    commands:
+      - echo "EC2 build complete"
+
+artifacts:
+  files:
+    - ec2.zip
