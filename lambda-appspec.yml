@@ -1,0 +1,12 @@
+version: 0.0
+Resources:
+  - simple-lambda:
+      Type: AWS::Lambda::Function
+      Properties:
+        Name: dev-simple-lambda
+        Alias: live
+        CurrentVersion: "1"
+        TargetVersion: "2"
+Hooks:
+  - BeforeAllowTraffic: simple-lambda:BeforeAllowTraffic
+  - AfterAllowTraffic: simple-lambda:AfterAllowTraffic

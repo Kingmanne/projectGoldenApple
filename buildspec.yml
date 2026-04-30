@@ -50,6 +50,10 @@ phases:
 
 artifacts:
   files:
+    - lambda-appspec.yml
+    - lambda-appspec.yml
+  files:
+    - lambda-appspec.yml
     - appspec.yml
     - ec2/.env
     - ec2/package.json
