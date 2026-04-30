@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuites name="jest tests" tests="6" failures="0" errors="0" time="0.211">
-  <testsuite name="Express Application Tests" errors="0" failures="0" skipped="0" timestamp="2026-04-30T09:50:43" time="0.186" tests="6">
-    <testcase classname="Express Application Tests should respond with 200 on GET /" name="Express Application Tests should respond with 200 on GET /" time="0.011">
+<testsuites name="jest tests" tests="6" failures="0" errors="0" time="0.158">
+  <testsuite name="Express Application Tests" errors="0" failures="0" skipped="0" timestamp="2026-04-30T10:19:08" time="0.129" tests="6">
+    <testcase classname="Express Application Tests should respond with 200 on GET /" name="Express Application Tests should respond with 200 on GET /" time="0.01">
     </testcase>
     <testcase classname="Express Application Tests should serve HTML content" name="Express Application Tests should serve HTML content" time="0.002">
     </testcase>
     <testcase classname="Express Application Tests should return 404 for unknown routes" name="Express Application Tests should return 404 for unknown routes" time="0.002">
     </testcase>
-    <testcase classname="Express Application Tests should serve static files" name="Express Application Tests should serve static files" time="0.005">
+    <testcase classname="Express Application Tests should serve static files" name="Express Application Tests should serve static files" time="0.001">
     </testcase>
     <testcase classname="Express Application Tests should create valid express app" name="Express Application Tests should create valid express app" time="0.001">
     </testcase>

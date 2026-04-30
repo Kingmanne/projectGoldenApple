@@ -3,7 +3,7 @@ Resources:
   - simple-lambda:
       Type: AWS::Lambda::Function
       Properties:
-        Name: dev-simple-lambda
+        Name: dev-lambda-simple
         Alias: live
         CurrentVersion: "1"
         TargetVersion: "2"
