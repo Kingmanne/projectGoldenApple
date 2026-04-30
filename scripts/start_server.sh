@@ -1,10 +1,17 @@
 #!/bin/bash
 echo "🚀 Starting Sour Mango application..."
 
-cd /home/ec2-user/sour-mango
+cd /home/ec2-user/sour-mango || {
+  echo "❌ Directory /home/ec2-user/sour-mango not found"
+  exit 1
+}
 
-# Start the application with PM2
-pm2 start server.js --name sour-mango
+echo "⏹ Stopping any existing Sour Mango process..."
+pm2 stop sour-mango || true
+pm2 delete sour-mango || true
+
+# Start the application with PM2 from the correct working directory
+pm2 start server.js --name sour-mango --cwd /home/ec2-user/sour-mango
 
 # Save PM2 process list (survives reboots)
 pm2 save
