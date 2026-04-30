@@ -1,26 +1,32 @@
 version: 0.0
 os: linux
+
 files:
   - source: /
     destination: /home/ec2-user/sour-mango
+
 hooks:
   ApplicationStop:
-    - location: ec2/scripts/stop_server.sh
+    - location: scripts/stop_server.sh
       timeout: 300
       runas: ec2-user
+
   BeforeInstall:
-    - location: ec2/scripts/before_install.sh
+    - location: scripts/before_install.sh
       timeout: 300
       runas: ec2-user
+
   AfterInstall:
-    - location: ec2/scripts/install_dependencies.sh
+    - location: scripts/install_dependencies.sh
       timeout: 300
       runas: ec2-user
+
   ApplicationStart:
-    - location: ec2/scripts/start_server.sh
+    - location: scripts/start_server.sh
       timeout: 300
       runas: ec2-user
+
   ValidateService:
-    - location: ec2/scripts/validate_service.sh
+    - location: scripts/validate_service.sh
       timeout: 300
       runas: ec2-user
