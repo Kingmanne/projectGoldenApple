@@ -5,8 +5,8 @@ phases:
     runtime-versions:
       nodejs: 18
     commands:
-      - echo "Installing dependencies..."
-      - npm ci
+      - echo "Installing EC2 dependencies..."
+      - cd ec2 && npm ci
 
   pre_build:
     commands:
@@ -23,65 +23,45 @@ phases:
       - echo "NODE_ENV=$NODE_ENV"
       - echo "APP_NAME=$APP_NAME"
       - echo "PORT=$PORT"
-      - echo "API_URL=$API_URL" # Comes automatically from parameter-store
 
-      # Run tests
-      - echo "Running tests..."
-      - npm test -- --coverage --coverageReporters=text
+      # Run EC2 tests
+      - echo "Running EC2 tests..."
+      - cd ec2 && npm test -- --coverage --coverageReporters=text
       - echo '=== Running security audit ==='
       - npm audit --audit-level=high
-      # Build fails here if high or critical vulnerabilities are found
       - echo '=== Security audit passed ==='
-      - npm audit --json > security-report.json || true
-      - npm audit --audit-level=high # this one actually fails the build
+      - npm audit --json > ../security-report.json || true
 
   build:
     commands:
-      - echo "Creating .env file..."
-        printf "NODE_ENV=%s\nAPP_NAME=%s\nPORT=%s\nAPI_URL=%s\n" \
-        "$NODE_ENV" "$APP_NAME" "$PORT" "$API_URL" > .env
+      - echo "Creating .env file for EC2..."
+      - cd ec2 && printf "NODE_ENV=%s\nAPP_NAME=%s\nPORT=%s\n" "$NODE_ENV" "$APP_NAME" "$PORT" > .env
       - echo ".env file created:"
-      - cat .env
+      - cat ec2/.env
+
+      - echo "Packaging Lambda..."
+      - cd lambda && zip -r ../lambda-function.zip . && cd ..
 
   post_build:
     commands:
-      - echo "Running smoke tests..."
-      - npm run test:smoke
+      - echo "Running EC2 smoke tests..."
+      - cd ec2 && npm run test:smoke
       - echo "✅ Build completed successfully for $APP_NAME ($ENVIRONMENT)!"
 
 artifacts:
   files:
     - appspec.yml
-    - .env
-    - package.json
-    - package-lock.json
-    - "public/**/*"
-    - "scripts/**/*"
-    - server.js
-    - smoke-test.js
-    - app.test.js
-    - index.html
+    - ec2/.env
+    - ec2/package.json
+    - ec2/package-lock.json
+    - "ec2/public/**/*"
+    - "ec2/scripts/**/*"
+    - ec2/server.js
+    - ec2/smoke-test.js
+    - "ec2/__tests__/**/*"
     - infrastructure.yml
-    - "**/*"
+    - lambda-function.zip
     - security-report.json
-      base-directory:build
 
   name: sour-mango-$ENVIRONMENT-artifact
   discard-paths: no
-  exclude-paths:
-    - node_modules/**/*
-    - coverage/**/*
-    - __tests__/**/*
-    - .git/**/*
-    - .gitignore
-    - buildspec.yml
-
-cache:
-  paths:
-    - "node_modules/**/*"
-
-reports:
-  MyAppTestReport:
-    files:
-      - "test-results/junit.xml"
-    file-format: JUNITXML
