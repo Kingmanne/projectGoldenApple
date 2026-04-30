@@ -1,7 +1,5 @@
 version: 0.2
 
-
-
 phases:
   install:
     runtime-versions:
@@ -25,7 +23,7 @@ phases:
       - echo "NODE_ENV=$NODE_ENV"
       - echo "APP_NAME=$APP_NAME"
       - echo "PORT=$PORT"
-      - echo "API_URL=$API_URL"  # Comes automatically from parameter-store
+      - echo "API_URL=$API_URL" # Comes automatically from parameter-store
 
       # Run tests
       - echo "Running tests..."
@@ -37,7 +35,6 @@ phases:
       - npm audit --json > security-report.json || true
       - npm audit --audit-level=high # this one actually fails the build
 
-  
   build:
     commands:
       - echo "Creating .env file..."
@@ -45,7 +42,7 @@ phases:
         "$NODE_ENV" "$APP_NAME" "$PORT" "$API_URL" > .env
       - echo ".env file created:"
       - cat .env
-  
+
   post_build:
     commands:
       - echo "Running smoke tests..."
@@ -58,14 +55,14 @@ artifacts:
     - .env
     - package.json
     - package-lock.json
-    - 'public/**/*'
-    - 'scripts/**/*'
+    - "public/**/*"
+    - "scripts/**/*"
     - server.js
     - smoke-test.js
     - app.test.js
     - index.html
     - infrastructure.yml
-    - '**/*'
+    - "**/*"
     - security-report.json
       base-directory:build
 
@@ -81,10 +78,10 @@ artifacts:
 
 cache:
   paths:
-    - 'node_modules/**/*'
+    - "node_modules/**/*"
 
 reports:
- MyAppTestReport:
-  files:
-    - 'test-results/junit.xml'
-  file-format: JUNITXML
+  MyAppTestReport:
+    files:
+      - "test-results/junit.xml"
+    file-format: JUNITXML

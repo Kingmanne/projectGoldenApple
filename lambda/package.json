@@ -1,0 +1,11 @@
+{
+  "name": "simple-lambda",
+  "version": "1.0.0",
+  "description": "Simple Lambda for multi-platform deployment test",
+  "main": "handler.js",
+  "scripts": {
+    "test": "echo \"No tests\""
+  },
+  "author": "",
+  "license": "ISC"
+}
