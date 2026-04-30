@@ -11,9 +11,9 @@ phases:
     commands:
       - echo "Building Lambda package..."
       - cd lambda
-      - pip install -r requirements.txt -t .
       - zip -r ../lambda.zip .
 
 artifacts:
   files:
     - lambda.zip
+    
