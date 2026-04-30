@@ -1,13 +1,11 @@
 #!/bin/bash
-echo "🧹 Cleaning up old deployment..."
+echo "🧹 Cleaning up old deployment artifacts..."
 
-# Remove old application directory
-sudo rm -rf /home/ec2-user/sour-mango
+# Stop running app first (important)
+pm2 stop sour-mango || true
+pm2 delete sour-mango || true
 
-# Create fresh directory
-sudo mkdir -p /home/ec2-user/sour-mango
-
-# Set proper ownership
-sudo chown -R ec2-user:ec2-user /home/ec2-user/sour-mango
+# Remove old app ONLY if needed
+rm -rf /home/ec2-user/sour-mango
 
 echo "✅ Cleanup complete"
