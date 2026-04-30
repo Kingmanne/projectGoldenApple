@@ -4,14 +4,54 @@ phases:
   install:
     runtime-versions:
       python: 3.11
-    commands:
-      - echo "Installing dependencies..."
 
   build:
     commands:
-      - echo "Building Lambda package..."
+      - echo "=== Lambda Build with Versioning ==="
+
       - cd lambda
+
+      # Package function
       - zip -r ../lambda.zip .
+
+      - cd ..
+
+      # Get current version from alias
+      - echo "Fetching current version..."
+      - CURRENT_VERSION=$(aws lambda get-alias \
+          --function-name dev-lambda-simple \
+          --name live \
+          --query 'FunctionVersion' \
+          --output text)
+
+      - echo "Current version: $CURRENT_VERSION"
+
+      # Publish new version
+      - echo "Publishing new version..."
+      - TARGET_VERSION=$(aws lambda publish-version \
+          --function-name dev-lambda-simple \
+          --query 'Version' \
+          --output text)
+
+      - echo "Target version: $TARGET_VERSION"
+
+      # Inject values into AppSpec
+      - echo "Updating AppSpec..."
+      - |
+        cat > appspec.yml <<EOF
+        version: 0.0
+        Resources:
+          - simple-lambda:
+              Type: AWS::Lambda::Function
+              Properties:
+                Name: dev-lambda-simple
+                Alias: live
+                CurrentVersion: $CURRENT_VERSION
+                TargetVersion: $TARGET_VERSION
+        EOF
+
+      # Repackage with AppSpec at root
+      - zip -g lambda.zip appspec.yml
 
 artifacts:
   files:

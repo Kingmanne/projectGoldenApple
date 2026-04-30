@@ -1,7 +1,0 @@
-version: 0.0
-Resources:
-  - simple-lambda:
-      Type: AWS::Lambda::Function
-      Properties:
-        Name: dev-lambda-simple
-        Alias: live
